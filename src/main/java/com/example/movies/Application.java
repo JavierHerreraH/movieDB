@@ -8,6 +8,22 @@ import java.sql.Statement;
 
 public class Application {
     public static void main(String[] args) {
+        if (args.length == 0) {
+            printUsage();
+            return;
+        }
+
+        String command = args[0];
+        if (command.equals("show-movies")) {
+            showMovies();
+        }
+    }
+
+    private static void printUsage() {
+        System.out.println("Usage: app <command> [options]");
+    }
+
+    private static void showMovies() {
         String url = System.getenv("DATASOURCE_URL");
         Connection connection = null;
         Statement statement = null;
@@ -16,12 +32,15 @@ public class Application {
         try {
             connection = DriverManager.getConnection(url);
             statement = connection.createStatement();
-            resultSet = statement.executeQuery("SELECT movie_id, title FROM movie LIMIT 10");
+            String sql = "SELECT movie_id, title, release_date FROM movie LIMIT 10";
+            resultSet = statement.executeQuery(sql);
 
+            System.out.println("id, title, year");
             while (resultSet.next()) {
                 int movieId = resultSet.getInt("movie_id");
                 String title = resultSet.getString("title");
-                System.out.println("Movie ID: " + movieId + ", Title: " + title);
+                int year = resultSet.getDate("release_date").toLocalDate().getYear();
+                System.out.println(movieId + ", " + title + ", " + year);
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -28,9 +28,7 @@ RUN --mount=type=bind,source=pom.xml,target=pom.xml \
 
 FROM package as development
 WORKDIR /build
-ARG PORT=8000
-EXPOSE ${PORT}
-CMD ["java", "-jar", "target/app.jar", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:${PORT}"]
+ENTRYPOINT ["java", "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000", "-jar", "target/app.jar"]
 
 FROM eclipse-temurin:21-jre-jammy AS final
 ARG UID=10001
