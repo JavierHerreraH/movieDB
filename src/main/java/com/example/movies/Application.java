@@ -54,6 +54,10 @@ public class Application {
             }
         }
     }
+
+    public static class MoviesDAO {
+        private Connection connection;
+    }
 }
 
 
