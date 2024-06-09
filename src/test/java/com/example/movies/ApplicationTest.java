@@ -10,29 +10,36 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 public class ApplicationTest {
-  final PrintStream originalOut = System.out;
-  final PrintStream originalErr = System.err;
-  final ByteArrayOutputStream out = new ByteArrayOutputStream();
-  final ByteArrayOutputStream err = new ByteArrayOutputStream();
+    private final PrintStream originalOut = System.out;
+    private final PrintStream originalErr = System.err;
+    private ByteArrayOutputStream out;
+    private ByteArrayOutputStream err;
 
-  @BeforeEach
-  public void setUp() {
-    out.reset();
-    err.reset();
-    System.setOut(new PrintStream(out));
-    System.setErr(new PrintStream(err));
-  }
+    @BeforeEach
+    public void setUp() {
+        out = new ByteArrayOutputStream();
+        err = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(out));
+        System.setErr(new PrintStream(err));
+    }
 
-  @AfterEach
-  public void tearDown() {
-    System.setOut(originalOut);
-    System.setErr(originalErr);
-  }
+    @AfterEach
+    public void tearDown() {
+        System.setOut(originalOut);
+        System.setErr(originalErr);
+    }
 
-  @Test
-  public void testPrintUsage() {
-    Application.main(new String[] {});
-    assertTrue(out.toString().contains("Usage:"));
-    assertEquals("", err.toString());
-  }
+    @Test
+    public void testPrintUsage() {
+        Application.main(new String[] {});
+        assertTrue(err.toString().trim().startsWith("Usage:"));
+        assertEquals("", out.toString());
+    }
+
+    @Test
+    public void testPrintHelp() {
+        Application.main(new String[] { "--help" });
+        assertTrue(out.toString().trim().startsWith("Usage:"));
+        assertEquals("", err.toString());
+    }
 }

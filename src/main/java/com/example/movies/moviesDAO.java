@@ -1,5 +1,7 @@
 package com.example.movies;
 
-public class MoviesDAO {
+import java.sql.Connection;
+
+class MoviesDAO {
     private Connection connection;
 }
