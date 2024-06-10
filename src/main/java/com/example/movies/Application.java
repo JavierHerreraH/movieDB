@@ -62,14 +62,19 @@ public class Application {
         String subcommand = args[1];
         Integer id = null;
         String title = null;
-        String year = null;
-        String director = null;
-        String producer = null;
-        String attribute = null;
-        String value = null;
-        String order = "asc";
-        int limit = 10;
-        int offset = 0;
+        Integer budget = null;
+        String homepage = null;
+        String overview = null;
+        Double popularity = null;
+        String release_date = null;
+        Integer revenue = null;
+        Integer runtime = null;
+        String movie_status = null;
+        String tagline = null;
+        Double votes_avg = null;
+        Integer votes_count = null;
+
+
 
         for (int i = 2; i < args.length; i++) {
             String option = args[i];
@@ -80,41 +85,34 @@ public class Application {
                 id = Integer.parseInt(val);
             } else if (option.startsWith("--title")) {
                 title = val;
-            } else if (option.startsWith("--year")) {
-                year = val;
-            } else if (option.startsWith("--director")) {
-                director = val;
-            } else if (option.startsWith("--producer")) {
-                producer = val;
-            } else if (option.startsWith("--attribute")) {
-                attribute = val;
-            } else if (option.startsWith("--value")) {
-                value = val;
-            } else if (option.startsWith("--order")) {
-                order = val;
-            } else if (option.startsWith("--limit")) {
-                limit = Integer.parseInt(val);
-            } else if (option.startsWith("--offset")) {
-                offset = Integer.parseInt(val);
+            } else if (option.startsWith("--budget")) {
+                budget = Integer.getInteger(val);
+            } else if (option.startsWith("--homepage")) {
+                homepage = val;
+            } else if (option.startsWith("--overview")) {
+                overview = val;
+            } else if (option.startsWith("--popularity")) {
+                popularity = Double.parseDouble(val);
+            } else if (option.startsWith("--release_date")) {
+                release_date = val;
+            } else if (option.startsWith("--revenue")) {
+                revenue = Integer.parseInt(val);
+            } else if (option.startsWith("--runtime")) {
+                runtime = Integer.parseInt(val);
+            } else if (option.startsWith("--movie_status")) {
+                movie_status = val;
+            } else if (option.startsWith("--tagline")) {
+                tagline = val;
+            } else if (option.startsWith("--votes_avg")) {
+                votes_avg = Double.parseDouble(val);
+            } else if (option.startsWith("--votes_count")) {
+                votes_count = Integer.parseInt(val);
             }
+
         }
 
         if (subcommand.equals("add")) {
-            addMovie(title, year, director, producer);
-        } else if (subcommand.equals("get")) {
-            getMovie(id);
-        } else if (subcommand.equals("update")) {
-            updateMovie(id, title, year, director, producer);
-        } else if (subcommand.equals("delete")) {
-            deleteMovie(id);
-        } else if (subcommand.equals("search")) {
-            searchMovies(attribute, value, order, limit, offset);
-        } else if (subcommand.equals("cast")) {
-            getMovieCast(id);
-        } else if (subcommand.equals("crew")) {
-            getMovieCrew(id);
-        } else if (subcommand.equals("top")) {
-            getTopMovies(attribute, limit);
+            addMovie(title, budget, homepage, overview, popularity, release_date, revenue, runtime, movie_status, tagline, votes_avg, votes_count);
         }
     }
 
@@ -150,70 +148,14 @@ public class Application {
         }
     }
 
-    private static void addMovie(String title, String year, String director, String producer) {
+    private static void addMovie(String title, Integer budget, String year, String director, Double popularity, String producer, Integer revenue, Integer runtime, String movie_status, String tagline, Double votes_avg, Integer votes_count) {
         Movie movie = new Movie();
         movie.setTitle(title);
-        movie.setYear(year);
-        movie.setDirector(director);
-        movie.setProducer(producer);
+        movie.setRelease_date(year);
         movie = movieDAO.save(movie);
         System.out.println(movie);
     }
 
-    private static void deleteMovie(Integer id) {
-        movieDAO.deleteById(id);
-    }
-
-    private static void getMovie(int id) {
-        try {
-            Movie movie = movieDAO.findById(id).get();
-            System.out.println(movie);
-        } catch (NoSuchElementException e) {
-            System.err.println("Error: No such movie found");
-        }
-    }
-
-    private static void updateMovie(Integer id, String title, String year, String director, String producer) {
-        try {
-            Movie movie = movieDAO.findById(id).get();
-            movie.setTitle(title);
-            movie.setYear(year);
-            movie.setDirector(director);
-            movie.setProducer(producer);
-            movie = movieDAO.save(movie);
-            System.out.println(movie);
-        } catch (NoSuchElementException e) {
-            System.err.println("Error: No such movie found");
-        }
-    }
-
-    private static void searchMovies(String attribute, String value, String order, int limit, int offset) {
-        List<Movie> movies = movieDAO.findMovies(attribute, order, limit, offset);
-        for (Movie movie : movies) {
-            System.out.println(movie);
-        }
-    }
-
-    private static void getMovieCast(int id) {
-        List<Actor> cast = movieDAO.getCast(id);
-        for (Actor actor : cast) {
-            System.out.println(actor);
-        }
-    }
-
-    private static void getMovieCrew(int id) {
-        List<CrewMember> crew = movieDAO.getCrew(id);
-        for (CrewMember crewMember : crew) {
-            System.out.println(crewMember);
-        }
-    }
-
-    private static void getTopMovies(String attribute, int limit) {
-        List<Movie> movies = movieDAO.findTopMovies(attribute, limit);
-        for (Movie movie : movies) {
-            System.out.println(movie);
-        }
-    }
 
     private static void printHelp() {
         System.out.println(
@@ -223,7 +165,7 @@ public class Application {
                         "  person get    --id <id>                Shows a person\n" +
                         "  person update --id <id> --name <name>  Updates a person\n" +
                         "  person delete --id <id>                Deletes a person\n" +
-                        "  movie add    --title <title> --year <year> --director <director> --producer <producer> Adds a movie\n" +
+                        "  movie add    --title <title> --budget <budget> --homepage <homepage> --overview <overview> --popularity <popularity> --release_date <release_date> --revenue <revenue> --runtime <runtime> --movie_status <movie_status> --tagline <tagline> --votes_avg <votes_avg> --votes_count <votes_count> Adds a movie\n" +
                         "  movie get    --id <id>                Shows a movie\n" +
                         "  movie update --id <id> --title <title> --year <year> --director <director> --producer <producer> Updates a movie\n" +
                         "  movie delete --id <id>                Deletes a movie\n" +

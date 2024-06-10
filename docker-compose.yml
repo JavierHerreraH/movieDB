@@ -40,7 +40,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: postgres@example.com
       PGADMIN_DEFAULT_PASSWORD: postgres
     ports:
-      - 8081:80
+      - 8083:80
     depends_on:
       db:
         condition: service_healthy
