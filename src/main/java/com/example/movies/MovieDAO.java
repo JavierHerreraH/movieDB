@@ -12,7 +12,7 @@ public class MovieDAO {
         this.connection = connection;
     }
 
-    // R01. Crear una película
+    // R01. Crear una película - R03. L'usuari pot actualitzar els detalls d'una pel·lícula
     public Movie save(Movie movie) {
         String sql = movie.getId() == null
                 ? "INSERT INTO movie (title, budget, homepage, overview, popularity, release_date, revenue, runtime, movie_status, tagline, vote_average, vote_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
@@ -25,7 +25,7 @@ public class MovieDAO {
             statement.setString(4, movie.getOverview());
             statement.setDouble(5, movie.getPopularity());
             statement.setDate(6, Date.valueOf(movie.getRelease_date()));
-            statement.setInt(7, movie.getRevenue());
+            statement.setLong(7, movie.getRevenue());
             statement.setInt(8, movie.getRuntime());
             statement.setString(9, movie.getMovie_status());
             statement.setString(10, movie.getTagline());
@@ -126,7 +126,7 @@ public class MovieDAO {
 
         return null;
     }
-
+//R07. L'usuari pot cercar pel·lícules per director (mostra id, títol i any de la pel·lícula)
     public List<Movie> findByDirector(String director) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_crew ON  movie.movie_id  = movie_crew.movie_id INNER JOIN person ON movie_crew.person_id = person.person_id  WHERE  job = 'Director' AND person_name = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -148,5 +148,124 @@ public class MovieDAO {
 
         return null;
     }
+   //R08. L'usuari pot cercar pel·lícules per actors (mostra id, títol i any de la pel·lícula)
+    public List<Movie> findByActor(String actor) {
+        String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_cast ON  movie.movie_id  = movie_cast.movie_id INNER JOIN person ON movie_cast.person_id = person.person_id  WHERE movie_cast.person_id is NOT NULL AND person_name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, actor);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <Movie>movies=new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movies.add(movie);
+                }
+                return movies;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
+        return null;
+    }
+
+    //R09. L'usuari pot cercar pel·lícules per gèneres (mostra id, títol i any de la pel·lícula)
+    public List<Movie> findByGenre(String genre) {
+        String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_genres ON  movie.movie_id  = movie_genres.movie_id INNER JOIN genre ON movie_genres.genre_id = genre.genre_id  WHERE genre_name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, genre);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <Movie>movies=new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movies.add(movie);
+                }
+                return movies;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+   // R13. L'usuari pot veure el ranking de les 10 pel·lícules que més han recaptat (mostra id, títol, any i recaptació)
+  public List<Movie> top10RevenueMovie() {
+      String sql = "SELECT movie_id, title, release_date, revenue FROM movie ORDER BY revenue DESC LIMIT 10 ";
+      try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+          try (ResultSet resultSet = statement.executeQuery()) {
+              List<Movie> movies = new ArrayList<>();
+              while (resultSet.next()) {
+                  Movie movie = new Movie();
+                  movie.setId(resultSet.getInt("movie_id"));
+                  movie.setTitle(resultSet.getString("title"));
+                  movie.setRelease_date(resultSet.getString("release_date"));
+                  movie.setRevenue(resultSet.getLong("revenue"));
+                  movies.add(movie);
+              }
+              return movies;
+          } catch (Exception e){
+              e.printStackTrace();
+          }
+      } catch (SQLException e) {
+          e.printStackTrace();
+      }
+
+      return null;
+  }
+    //  R14. L'usuari pot veure el ranking de les 10 pel·lícules amb major pressupost (mostra id, títol, any i pressupost)
+    public List<Movie> top10BudgetMovie() {
+        String sql = "SELECT movie_id, title, release_date, budget FROM movie ORDER BY budget DESC LIMIT 10 ";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Movie> movies = new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movie.setBudget(resultSet.getInt("budget"));
+                    movies.add(movie);
+                }
+                return movies;
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+   // R16. L'usuari pot veure el ranking de les 10 pel·lícules millor puntuades, només entre les que tenen més de 1000 vots (mostra id, títol, any i puntuació)
+    public List<Movie> top10RatingMovie() {
+        String sql = "SELECT movie_id, title, release_date, vote_average FROM movie WHERE vote_count > 1000 ORDER BY vote_average DESC LIMIT 10  ";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Movie> movies = new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movie.setVote_average(resultSet.getDouble("vote_average"));
+                    movies.add(movie);
+                }
+                return movies;
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }

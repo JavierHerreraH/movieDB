@@ -8,13 +8,16 @@ public class Movie {
     private String overview;
     private Double popularity;
     private String release_date;
-    private Integer revenue;
+    private Long revenue;
     private Integer runtime;
     private String movie_status;
     private String tagline;
     private Double vote_average;
     private Integer vote_count;
     private String director = "";
+    private String actor = "";
+    private String genre = "";
+
 
     public String getDirector() {
         return director;
@@ -23,6 +26,20 @@ public class Movie {
     public void setDirector(String director) {
         this.director = director;
     }
+
+    public String getActor() {
+        return actor;
+    }
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
+    public String getGenre() {
+        return genre;
+    }
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
+
 
 
 
@@ -55,9 +72,9 @@ public class Movie {
 
     public void setRelease_date(String release_date) {this.release_date = release_date;}
 
-    public Integer getRevenue() {return revenue;}
+    public Long getRevenue() {return revenue;}
 
-    public void setRevenue(Integer revenue) {this.revenue = revenue;}
+    public void setRevenue(Long revenue) {this.revenue = revenue;}
 
     public Integer getRuntime() {return runtime;}
 
@@ -100,11 +117,37 @@ public class Movie {
 
 
     public String resumen() {
-        return "Movie{" +
+        return "Movie {" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", release_date='" + release_date + '\'' +
                 '}';
     }
+    public String resumenRevenue(){
+        return "Movie {" +
+                "id= " + id +
+                ", title= '" + title + '\'' +
+                ", release_date= '" + release_date + '\'' +
+                ", revenue= " + revenue + "$" +
+                '}';
+    }
 
+
+    public String resumenBudget() {
+        return "Movie {" +
+                "id= " + id +
+                ", title= '" + title + '\'' +
+                ", release_date= '" + release_date + '\'' +
+                ", budget= " + budget + "$" +
+                '}';
+    }
+
+    public String resumenVoteAverage() {
+        return "Movie {" +
+                "id= " + id +
+                ", title= '" + title + '\'' +
+                ", release_date= '" + release_date + '\'' +
+                ", rating= " + vote_average +
+                '}';
+    }
 }
