@@ -14,6 +14,17 @@ public class Movie {
     private String tagline;
     private Double vote_average;
     private Integer vote_count;
+    private String director = "";
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+
 
     // Getters and setters
     public Integer getId() {return id;}
@@ -86,4 +97,14 @@ public class Movie {
                 ", vote_count='" + vote_count + '\'' +
                 '}';
     }
+
+
+    public String resumen() {
+        return "Movie{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", release_date='" + release_date + '\'' +
+                '}';
+    }
+
 }

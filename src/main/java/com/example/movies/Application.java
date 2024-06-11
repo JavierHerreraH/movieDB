@@ -92,17 +92,29 @@ public class Application {
                 movie.setVote_average(Double.parseDouble(val));
             } else if (option.startsWith("--vote_count")) {
                 movie.setVote_count(Integer.parseInt(val));
+            } else if (option.startsWith("--director")) {
+                movie.setDirector(val);
             }
-
         }
 
         if (subcommand.equals("add")) {
             addMovie(movie);
         } else if (subcommand.equals("get")) {
-            getMovie(movie.getId());
+            if (!movie.getDirector().isEmpty()){
+                getMovieDirector(movie.getDirector());
+            } else {
+                getMovie(movie.getId());
+            }
+
         } else if (subcommand.equals("update")) {
             updateMovie(movie);
-        } 
+        } else if (subcommand.equals("delete")) {
+            deleteMovie(movie.getId());
+        } else if (subcommand.equals("cast")) {
+            getCast(movie.getId());
+        } else if (subcommand.equals("crew")) {
+            getCrew(movie.getId());
+        }
     }
 
     private static void addPerson(String name) {
@@ -173,6 +185,47 @@ public class Application {
             System.err.println("Error: No such movie found");
         }
     }
+
+    private static void deleteMovie(Integer id) {
+        movieDAO.deleteById(id);
+    }
+
+    private static void getCast(int id) {
+        try {
+            List<MovieCast> movieCasts = movieDAO.getCastByIdMovie(id);
+            for (MovieCast c: movieCasts){
+                System.out.println(c);
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such cast found");
+        }
+    }
+
+    private static void getCrew(Integer id) {
+        try {
+            List<MovieCrew> movieCrews = movieDAO.getCrewByIdMovie(id);
+            for (MovieCrew c: movieCrews){
+                System.out.println(c);
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such crew found");
+        }
+    }
+
+    private static void getMovieDirector(String director) {
+        try {
+            List<Movie> movie = movieDAO.findByDirector(director);
+            for (Movie c: movie){
+                System.out.println(c.resumen());
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such movie found");
+        }
+    }
+
 
 
     private static void printHelp() {

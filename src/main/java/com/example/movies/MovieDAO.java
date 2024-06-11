@@ -49,7 +49,7 @@ public class MovieDAO {
         return movie;
     }
 
-    // R02.
+    // R02. L'usuari pot consultar els detalls d'una pel·lícula (tots els atributs propis de la pel·lícula, així com director, companyia productora, gèneres, paraules clau, llenguatges, país de producció)
     public Optional<Movie> findById(int id) {
         String sql = "SELECT * FROM movie WHERE movie_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -68,7 +68,7 @@ public class MovieDAO {
 
         return Optional.empty();
     }
-
+// R04. L'usuari pot eliminar una pel·lícula
     public void deleteById(int id) {
         String sql = "DELETE FROM movie WHERE movie_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -78,4 +78,75 @@ public class MovieDAO {
             e.printStackTrace();
         }
     }
+
+    // - R05. L'usuari pot consultar els actors (cast) d'una pel·lícula donada (mostra el nom de cada actor i el personatge que ha interpretat)
+    public List<MovieCast> getCastByIdMovie(int id) {
+        String sql = "SELECT character_name, person_name FROM movie_cast INNER JOIN person ON movie_cast.person_id = person.person_id WHERE movie_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <MovieCast>casts=new ArrayList<>();
+                while (resultSet.next()) {
+                    MovieCast movieCast = new MovieCast();
+                    movieCast.setCharacter_name(resultSet.getString("character_name"));
+                    Person person = new Person();
+                    person.setName(resultSet.getString("person_name"));
+                    movieCast.setPerson(person);
+                    casts.add(movieCast);
+                }
+                return casts;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    //R06. L'usuari pot consultar qui ha fet feina (crew) en la producció d'una pel·lícula donada (mostra el nom de cada persona, el departament i la feina que ha fet)
+
+    public List<MovieCrew> getCrewByIdMovie(int id) {
+        String sql = "SELECT department_name, person_name, job FROM movie_crew INNER JOIN person ON movie_crew.person_id = person.person_id INNER JOIN department ON movie_crew.department_id = department.department_id WHERE movie_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <MovieCrew>casts=new ArrayList<>();
+                while (resultSet.next()) {
+                    MovieCrew movieCrew = new MovieCrew();
+                    movieCrew.setDepartment_name(resultSet.getString("department_name"));
+                    movieCrew.setJob(resultSet.getString("job"));
+                    movieCrew.setPerson_name(resultSet.getString("person_name"));
+                    casts.add(movieCrew);
+                }
+                return casts;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public List<Movie> findByDirector(String director) {
+        String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_crew ON  movie.movie_id  = movie_crew.movie_id INNER JOIN person ON movie_crew.person_id = person.person_id  WHERE  job = 'Director' AND person_name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, director);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <Movie>movies=new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movies.add(movie);
+                }
+                return movies;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
 }
