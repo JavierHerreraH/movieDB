@@ -60,60 +60,49 @@ public class Application {
 
     private static void handleMovieCommand(String[] args) {
         String subcommand = args[1];
-        Integer id = null;
-        String title = null;
-        Integer budget = null;
-        String homepage = null;
-        String overview = null;
-        Double popularity = null;
-        String release_date = null;
-        Integer revenue = null;
-        Integer runtime = null;
-        String movie_status = null;
-        String tagline = null;
-        Double votes_avg = null;
-        Integer votes_count = null;
-
-
-
+        Movie movie = new Movie();
         for (int i = 2; i < args.length; i++) {
             String option = args[i];
             String val = option.contains("=")
                     ? option.split("=")[1]
                     : i + 1 < args.length ? args[i + 1] : null;
             if (option.startsWith("--id")) {
-                id = Integer.parseInt(val);
+                movie.setId(Integer.parseInt(val));
             } else if (option.startsWith("--title")) {
-                title = val;
+                movie.setTitle(val);
             } else if (option.startsWith("--budget")) {
-                budget = Integer.getInteger(val);
+                movie.setBudget(Integer.parseInt(val));
             } else if (option.startsWith("--homepage")) {
-                homepage = val;
+                movie.setHomepage(val);
             } else if (option.startsWith("--overview")) {
-                overview = val;
+                movie.setOverview(val);
             } else if (option.startsWith("--popularity")) {
-                popularity = Double.parseDouble(val);
+                movie.setPopularity(Double.parseDouble(val));
             } else if (option.startsWith("--release_date")) {
-                release_date = val;
+                movie.setRelease_date(val);
             } else if (option.startsWith("--revenue")) {
-                revenue = Integer.parseInt(val);
+                movie.setRevenue(Integer.parseInt(val));
             } else if (option.startsWith("--runtime")) {
-                runtime = Integer.parseInt(val);
+                movie.setRuntime(Integer.parseInt(val));
             } else if (option.startsWith("--movie_status")) {
-                movie_status = val;
+                movie.setMovie_status(val);
             } else if (option.startsWith("--tagline")) {
-                tagline = val;
-            } else if (option.startsWith("--votes_avg")) {
-                votes_avg = Double.parseDouble(val);
-            } else if (option.startsWith("--votes_count")) {
-                votes_count = Integer.parseInt(val);
+                movie.setTagline(val);
+            } else if (option.startsWith("--vote_average")) {
+                movie.setVote_average(Double.parseDouble(val));
+            } else if (option.startsWith("--vote_count")) {
+                movie.setVote_count(Integer.parseInt(val));
             }
 
         }
 
         if (subcommand.equals("add")) {
-            addMovie(title, budget, homepage, overview, popularity, release_date, revenue, runtime, movie_status, tagline, votes_avg, votes_count);
-        }
+            addMovie(movie);
+        } else if (subcommand.equals("get")) {
+            getMovie(movie.getId());
+        } else if (subcommand.equals("update")) {
+            updateMovie(movie);
+        } 
     }
 
     private static void addPerson(String name) {
@@ -148,12 +137,41 @@ public class Application {
         }
     }
 
-    private static void addMovie(String title, Integer budget, String year, String director, Double popularity, String producer, Integer revenue, Integer runtime, String movie_status, String tagline, Double votes_avg, Integer votes_count) {
-        Movie movie = new Movie();
-        movie.setTitle(title);
-        movie.setRelease_date(year);
+    private static void addMovie(Movie movie) {
         movie = movieDAO.save(movie);
         System.out.println(movie);
+    }
+
+    private static void updateMovie(Movie updatedMovie) {
+        try {
+            Movie movie = movieDAO.findById(updatedMovie.getId()).get();
+            movie.setTitle(updatedMovie.getTitle() != null ? updatedMovie.getTitle() : movie.getTitle());
+            movie.setBudget(updatedMovie.getBudget() != null ? updatedMovie.getBudget() : movie.getBudget());
+            movie.setHomepage(updatedMovie.getHomepage() != null ? updatedMovie.getHomepage() : movie.getHomepage());
+            movie.setOverview(updatedMovie.getOverview() != null ? updatedMovie.getOverview() : movie.getOverview());
+            movie.setPopularity(updatedMovie.getPopularity() != null ? updatedMovie.getPopularity() : movie.getPopularity());
+            movie.setRelease_date(updatedMovie.getRelease_date() != null ? updatedMovie.getRelease_date() : movie.getRelease_date());
+            movie.setRevenue(updatedMovie.getRevenue() != null ? updatedMovie.getRevenue() : movie.getRevenue());
+            movie.setRuntime(updatedMovie.getRuntime() != null ? updatedMovie.getRuntime() : movie.getRuntime());
+            movie.setMovie_status(updatedMovie.getMovie_status() != null ? updatedMovie.getMovie_status() : movie.getMovie_status());
+            movie.setTagline(updatedMovie.getTagline() != null ? updatedMovie.getTagline() : movie.getTagline());
+            movie.setVote_average(updatedMovie.getVote_average() != null ? updatedMovie.getVote_average() : movie.getVote_average());
+            movie.setVote_count(updatedMovie.getVote_count() != null ? updatedMovie.getVote_count() : movie.getVote_count());
+            movie = movieDAO.save(movie);
+            System.out.println(movie);
+        } catch (NoSuchElementException e) {
+            System.err.println("Error: No such person found");
+        }
+    }
+
+    private static void getMovie(int id) {
+        try {
+            Movie movie = movieDAO.findById(id).get();
+            System.out.println(movie);
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such movie found");
+        }
     }
 
 
@@ -165,7 +183,7 @@ public class Application {
                         "  person get    --id <id>                Shows a person\n" +
                         "  person update --id <id> --name <name>  Updates a person\n" +
                         "  person delete --id <id>                Deletes a person\n" +
-                        "  movie add    --title <title> --budget <budget> --homepage <homepage> --overview <overview> --popularity <popularity> --release_date <release_date> --revenue <revenue> --runtime <runtime> --movie_status <movie_status> --tagline <tagline> --votes_avg <votes_avg> --votes_count <votes_count> Adds a movie\n" +
+                        "  movie add    --title <title> --budget <budget> --homepage <homepage> --overview <overview> --popularity <popularity> --release_date <release_date> --revenue <revenue> --runtime <runtime> --movie_status <movie_status> --tagline <tagline> --vote_average <vote_average> --vote_count <vote_count> Adds a movie\n" +
                         "  movie get    --id <id>                Shows a movie\n" +
                         "  movie update --id <id> --title <title> --year <year> --director <director> --producer <producer> Updates a movie\n" +
                         "  movie delete --id <id>                Deletes a movie\n" +
