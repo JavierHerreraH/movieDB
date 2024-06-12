@@ -7,7 +7,7 @@ public class Movie {
     private String homepage;
     private String overview;
     private Double popularity;
-    private String release_date;
+    private String release_date = "";
     private Long revenue;
     private Integer runtime;
     private String movie_status;
@@ -17,7 +17,15 @@ public class Movie {
     private String director = "";
     private String actor = "";
     private String genre = "";
+    private String keyword = "";
+    private String production = "";
 
+    public String getProduction() {
+        return production;
+    }
+    public void setProduction(String production) {
+        this.production = production;
+    }
 
     public String getDirector() {
         return director;
@@ -40,7 +48,12 @@ public class Movie {
         this.genre = genre;
     }
 
-
+    public String getKeyword() {
+        return keyword;
+    }
+    public void setKeyword(String keyword) {
+        this.keyword = keyword;
+    }
 
 
     // Getters and setters
@@ -150,4 +163,5 @@ public class Movie {
                 ", rating= " + vote_average +
                 '}';
     }
+
 }

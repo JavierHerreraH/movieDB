@@ -79,8 +79,9 @@ public class Application {
             } else if (option.startsWith("--overview")) {
                 movie.setOverview(val);
             } else if (option.startsWith("--popularity")) {
-                movie.setPopularity(Double.parseDouble(val));
-            } else if (option.startsWith("--release_date")) {
+                //movie.setPopularity(Double.parseDouble(val));
+                topSearch = 4;
+            } else if (option.startsWith("--year")) {
                 movie.setRelease_date(val);
             } else if (option.startsWith("--revenue")) {
                // movie.setRevenue(Integer.parseInt(val));
@@ -102,6 +103,10 @@ public class Application {
                 movie.setActor(val);
             } else if (option.startsWith("--genre")) {
                 movie.setGenre(val);
+            } else if (option.startsWith("--keyword")) {
+                movie.setKeyword(val);
+            }else if (option.startsWith("--production")) {
+                movie.setProduction(val);
             }
 
             if (subcommand.equals("add")) {
@@ -113,7 +118,14 @@ public class Application {
                     getMovieActor(movie.getActor());
                 } else if (!movie.getGenre().isEmpty()) {
                     getMovieGenre(movie.getGenre());
-                } else {
+                }else if (!movie.getRelease_date().isEmpty()) {
+                    getMovieYear(movie.getRelease_date());
+                } else if (!movie.getKeyword().isEmpty()) {
+                    getMovieKeyword(movie.getKeyword());
+                }else if (!movie.getProduction().isEmpty()) {
+                    getMovieProductions(movie.getProduction());
+                }
+                else {
                     getMovie(movie.getId());
                 }
             } else if (subcommand.equals("update")) {
@@ -131,6 +143,8 @@ public class Application {
                     getTopMovieBudget();
                 } else if (topSearch == 3){
                     getTopMovieRating();
+                }else if (topSearch == 4){
+                    getTopMoviePopularity();
                 }
             }
         }
@@ -245,6 +259,39 @@ public class Application {
             }
         }
 
+    private static void getMovieYear(String release_date){
+        try {
+            List<Movie> movie = movieDAO.findByReleaseDate(release_date);
+            for (Movie c : movie) {
+                System.out.println(c.resumen());
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such movie found");
+        }
+    }
+    private static void getMovieProductions(String production){
+        try {
+            List<Movie> movie = movieDAO.findByProduction(production);
+            for (Movie c : movie) {
+                System.out.println(c.resumen());
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such movie found");
+        }
+    }
+    private static void getMovieKeyword(String keyword){
+        try {
+            List<Movie> movie = movieDAO.findByKeyword(keyword);
+            for (Movie c : movie) {
+                System.out.println(c.resumen());
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such movie found");
+        }
+    }
         private static void getMovieActor(String actor){
             try {
                 List<Movie> movie = movieDAO.findByActor(actor);
@@ -293,7 +340,18 @@ public class Application {
         }
 
     }
+    private static void getTopMoviePopularity(){
+        try {
+            List<Movie> movie = movieDAO.top10PopularMovie();
+            for (Movie c : movie) {
+                System.out.println(c.resumenVoteAverage());
+            }
+        } catch (NoSuchElementException e) {
+            System.err.println(e);
+            System.err.println("Error: No such movie found");
+        }
 
+    }
     private static void getTopMovieRating(){
         try {
             List<Movie> movie = movieDAO.top10RatingMovie();
@@ -317,7 +375,7 @@ public class Application {
                             "  person update --id <id> --name <name>  Updates a person\n" +
                             "  person delete --id <id>                Deletes a person\n" +
                             "  movie add    --title <title> --budget <budget> --homepage <homepage> --overview <overview> --popularity <popularity> --release_date <release_date> --revenue <revenue> --runtime <runtime> --movie_status <movie_status> --tagline <tagline> --vote_average <vote_average> --vote_count <vote_count> Adds a movie\n" +
-                            "  movie get    --id <id>  --director <name_director>               Shows a movie\n" +
+                            "  movie get    --id <id> || --director <name_director> || --genre <genre> || --actor <actor> --year <year> ||              Shows a movie\n" +
                             "  movie update --id <id> --title <title> --year <year> --director <director> --producer <producer> Updates a movie\n" +
                             "  movie delete --id <id>                Deletes a movie\n" +
                             "  movie cast   --id <id>                Shows the cast of a movie\n" +

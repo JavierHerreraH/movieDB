@@ -193,7 +193,79 @@ public class MovieDAO {
 
         return null;
     }
-   // R13. L'usuari pot veure el ranking de les 10 pel·lícules que més han recaptat (mostra id, títol, any i recaptació)
+    //R10. L'usuari pot cercar pel·lícules per any (mostra id, títol i any de la pel·lícula)
+    public List<Movie> findByReleaseDate(String release_date) {
+        String sql = "SELECT title, movie.movie_id, release_date FROM movie WHERE DATE_PART('year', release_date) = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            int year = Integer.parseInt(release_date);
+            statement.setInt(1, year);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Movie> movies = new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movies.add(movie);
+                }
+                return movies;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (NumberFormatException e) {
+            // Manejo del caso en que release_date no sea un número válido
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    //R11. L'usuari pot cercar pel·lícules per paraules clau (mostra id, títol i any de la pel·lícula)
+    public List<Movie> findByKeyword(String Keyword) {
+        String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_keywords ON movie.movie_id  = movie_keywords.movie_id INNER JOIN keyword ON keyword.keyword_id = movie_keywords.keyword_id  WHERE keyword_name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, Keyword);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <Movie>movies=new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movies.add(movie);
+                }
+                return movies;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    //R12. L'usuari pot cercar pel·lícules per companyia productora (mostra id, títol i any de la pel·lícula)
+    public List<Movie> findByProduction(String production) {
+        String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_company ON movie.movie_id  = movie_company.movie_id INNER JOIN production_company ON movie_company.company_id = production_company.company_id  WHERE company_name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, production);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List <Movie>movies=new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movies.add(movie);
+                }
+                return movies;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    // R13. L'usuari pot veure el ranking de les 10 pel·lícules que més han recaptat (mostra id, títol, any i recaptació)
   public List<Movie> top10RevenueMovie() {
       String sql = "SELECT movie_id, title, release_date, revenue FROM movie ORDER BY revenue DESC LIMIT 10 ";
       try (PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -231,6 +303,31 @@ public class MovieDAO {
                     movie.setTitle(resultSet.getString("title"));
                     movie.setRelease_date(resultSet.getString("release_date"));
                     movie.setBudget(resultSet.getInt("budget"));
+                    movies.add(movie);
+                }
+                return movies;
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    //R15. L'usuari pot veure el ranking de les 10 pel·lícules més populars (mostra id, títol, any i número de vots)
+    public List<Movie> top10PopularMovie() {
+        String sql = "SELECT movie_id, title, release_date, popularity FROM movie ORDER BY popularity DESC LIMIT 10 ";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                List<Movie> movies = new ArrayList<>();
+                while (resultSet.next()) {
+                    Movie movie = new Movie();
+                    movie.setId(resultSet.getInt("movie_id"));
+                    movie.setTitle(resultSet.getString("title"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movie.setPopularity(resultSet.getDouble("popularity"));
                     movies.add(movie);
                 }
                 return movies;
