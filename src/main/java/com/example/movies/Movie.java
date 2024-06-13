@@ -10,7 +10,7 @@ public class Movie {
     private String homepage;
     private String overview;
     private Double popularity;
-    private String release_date = "";
+    private String release_date;
     private Long revenue;
     private Integer runtime;
     private String movie_status;

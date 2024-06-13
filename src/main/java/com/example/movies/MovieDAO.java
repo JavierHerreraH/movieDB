@@ -18,19 +18,21 @@ public class MovieDAO {
                 ? "INSERT INTO movie (title, budget, homepage, overview, popularity, release_date, revenue, runtime, movie_status, tagline, vote_average, vote_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
                 : "UPDATE movie SET title = ?, budget = ?, homepage = ?, overview = ?, popularity = ?, release_date = ?, revenue = ?, runtime = ?, movie_status = ?, tagline = ?, vote_average = ?, vote_count = ? WHERE movie_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql,
-            PreparedStatement.RETURN_GENERATED_KEYS)) {
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+
             statement.setString(1, movie.getTitle());
-            statement.setInt(2, movie.getBudget());
+            statement.setObject(2, movie.getBudget(), Types.INTEGER);
             statement.setString(3, movie.getHomepage());
             statement.setString(4, movie.getOverview());
-            statement.setDouble(5, movie.getPopularity());
-            statement.setDate(6, Date.valueOf(movie.getRelease_date()));
-            statement.setLong(7, movie.getRevenue());
-            statement.setInt(8, movie.getRuntime());
+            statement.setObject(5, movie.getPopularity(), Types.DOUBLE);
+            statement.setObject(6, movie.getRelease_date() != null ? Date.valueOf(movie.getRelease_date()) : null, Types.DATE);
+            statement.setObject(7, movie.getRevenue(), Types.BIGINT);
+            statement.setObject(8, movie.getRuntime(), Types.INTEGER);
             statement.setString(9, movie.getMovie_status());
             statement.setString(10, movie.getTagline());
-            statement.setDouble(11, movie.getVote_average());
-            statement.setInt(12, movie.getVote_count());
+            statement.setObject(11, movie.getVote_average(), Types.DOUBLE);
+            statement.setObject(12, movie.getVote_count(), Types.INTEGER);
+
             if (movie.getId() == null) {
                 statement.executeUpdate();
                 try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -48,6 +50,7 @@ public class MovieDAO {
 
         return movie;
     }
+
 
     // R02. L'usuari pot consultar els detalls d'una pel·lícula (tots els atributs propis de la pel·lícula, així com director, companyia productora, gèneres, paraules clau, llenguatges, país de producció)
     public Optional<Movie> findById(int id, String order, boolean ascendent, int page, int pageSize) {
@@ -76,6 +79,18 @@ public class MovieDAO {
                     Movie movie = new Movie();
                     movie.setId(resultSet.getInt("movie_id"));
                     movie.setTitle(resultSet.getString("title"));
+                    movie.setBudget(resultSet.getInt("budget"));
+                    movie.setHomepage(resultSet.getString("homepage"));
+                    movie.setOverview(resultSet.getString("overview"));
+                    movie.setPopularity(resultSet.getDouble("popularity"));
+                    movie.setRelease_date(resultSet.getString("release_date"));
+                    movie.setRevenue(resultSet.getLong("revenue"));
+                    movie.setBudget(resultSet.getInt("runtime"));
+                    movie.setMovie_status(resultSet.getString("movie_status"));
+                    movie.setTagline(resultSet.getString("tagline"));
+                    movie.setVote_average(resultSet.getDouble("vote_average"));
+                    movie.setVote_count(resultSet.getInt("vote_count"));
+
                     return Optional.of(movie);
                 }
             }
@@ -106,9 +121,6 @@ public class MovieDAO {
                 while (resultSet.next()) {
                     MovieCast movieCast = new MovieCast();
                     movieCast.setCharacter_name(resultSet.getString("character_name"));
-                    //Person person = new Person();
-                    //person.setName(resultSet.getString("person_name"));
-                    //movieCast.setPerson(person);
                     movieCast.setName(resultSet.getString("person_name"));
                     casts.add(movieCast);
                 }
