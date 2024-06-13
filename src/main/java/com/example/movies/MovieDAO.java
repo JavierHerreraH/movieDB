@@ -18,7 +18,7 @@ public class MovieDAO {
                 ? "INSERT INTO movie (title, budget, homepage, overview, popularity, release_date, revenue, runtime, movie_status, tagline, vote_average, vote_count) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)"
                 : "UPDATE movie SET title = ?, budget = ?, homepage = ?, overview = ?, popularity = ?, release_date = ?, revenue = ?, runtime = ?, movie_status = ?, tagline = ?, vote_average = ?, vote_count = ? WHERE movie_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql,
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, movie.getTitle());
             statement.setInt(2, movie.getBudget());
             statement.setString(3, movie.getHomepage());
@@ -50,8 +50,25 @@ public class MovieDAO {
     }
 
     // R02. L'usuari pot consultar els detalls d'una pel·lícula (tots els atributs propis de la pel·lícula, així com director, companyia productora, gèneres, paraules clau, llenguatges, país de producció)
-    public Optional<Movie> findById(int id) {
+    public Optional<Movie> findById(int id, String order, boolean ascendent, int page, int pageSize) {
         String sql = "SELECT * FROM movie WHERE movie_id = ?";
+        if(!order.isEmpty()){
+            sql += " ORDER BY " + order;
+            if(ascendent){
+                sql += " ASC";
+            } else {
+                sql += " DESC";
+            }
+        }
+        if (pageSize > 0){
+            sql += " LIMIT " + pageSize;
+            int n = 1;
+            if (page > 0){
+                n = page;
+            }
+            int count = (n - 1) * pageSize;
+            sql += " OFFSET " + count;
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -89,9 +106,10 @@ public class MovieDAO {
                 while (resultSet.next()) {
                     MovieCast movieCast = new MovieCast();
                     movieCast.setCharacter_name(resultSet.getString("character_name"));
-                    Person person = new Person();
-                    person.setName(resultSet.getString("person_name"));
-                    movieCast.setPerson(person);
+                    //Person person = new Person();
+                    //person.setName(resultSet.getString("person_name"));
+                    //movieCast.setPerson(person);
+                    movieCast.setName(resultSet.getString("person_name"));
                     casts.add(movieCast);
                 }
                 return casts;
@@ -127,8 +145,25 @@ public class MovieDAO {
         return null;
     }
 //R07. L'usuari pot cercar pel·lícules per director (mostra id, títol i any de la pel·lícula)
-    public List<Movie> findByDirector(String director) {
+    public List<Movie> findByDirector(String director, String order, Boolean ascendent, int page, int pageSize) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_crew ON  movie.movie_id  = movie_crew.movie_id INNER JOIN person ON movie_crew.person_id = person.person_id  WHERE  job = 'Director' AND person_name = ?";
+       if(!order.isEmpty()){
+           sql += " ORDER BY " + order;
+           if(ascendent){
+               sql += " ASC";
+           } else {
+               sql += " DESC";
+           }
+       }
+       if (pageSize > 0){
+           sql += " LIMIT " + pageSize;
+           int n = 1;
+           if (page > 0){
+               n = page;
+           }
+           int count = (n - 1) * pageSize;
+           sql += " OFFSET " + count;
+       }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, director);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -149,8 +184,25 @@ public class MovieDAO {
         return null;
     }
    //R08. L'usuari pot cercar pel·lícules per actors (mostra id, títol i any de la pel·lícula)
-    public List<Movie> findByActor(String actor) {
+    public List<Movie> findByActor(String actor, String order, boolean ascendent, int page, int pageSize) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_cast ON  movie.movie_id  = movie_cast.movie_id INNER JOIN person ON movie_cast.person_id = person.person_id  WHERE movie_cast.person_id is NOT NULL AND person_name = ?";
+        if(!order.isEmpty()){
+            sql += " ORDER BY " + order;
+            if(ascendent){
+                sql += " ASC";
+            } else {
+                sql += " DESC";
+            }
+        }
+        if (pageSize > 0){
+            sql += " LIMIT " + pageSize;
+            int n = 1;
+            if (page > 0){
+                n = page;
+            }
+            int count = (n - 1) * pageSize;
+            sql += " OFFSET " + count;
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, actor);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -172,8 +224,25 @@ public class MovieDAO {
     }
 
     //R09. L'usuari pot cercar pel·lícules per gèneres (mostra id, títol i any de la pel·lícula)
-    public List<Movie> findByGenre(String genre) {
+    public List<Movie> findByGenre(String genre, String order, boolean ascendent, int page, int pageSize) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_genres ON  movie.movie_id  = movie_genres.movie_id INNER JOIN genre ON movie_genres.genre_id = genre.genre_id  WHERE genre_name = ?";
+        if(!order.isEmpty()){
+            sql += " ORDER BY " + order;
+            if(ascendent){
+                sql += " ASC";
+            } else {
+                sql += " DESC";
+            }
+        }
+        if (pageSize > 0){
+            sql += " LIMIT " + pageSize;
+            int n = 1;
+            if (page > 0){
+                n = page;
+            }
+            int count = (n - 1) * pageSize;
+            sql += " OFFSET " + count;
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, genre);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -194,8 +263,25 @@ public class MovieDAO {
         return null;
     }
     //R10. L'usuari pot cercar pel·lícules per any (mostra id, títol i any de la pel·lícula)
-    public List<Movie> findByReleaseDate(String release_date) {
+    public List<Movie> findByReleaseDate(String release_date, String order, boolean ascendent, int page, int pageSize) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie WHERE DATE_PART('year', release_date) = ?";
+        if(!order.isEmpty()){
+            sql += " ORDER BY " + order;
+            if(ascendent){
+                sql += " ASC";
+            } else {
+                sql += " DESC";
+            }
+        }
+        if (pageSize > 0){
+            sql += " LIMIT " + pageSize;
+            int n = 1;
+            if (page > 0){
+                n = page;
+            }
+            int count = (n - 1) * pageSize;
+            sql += " OFFSET " + count;
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             int year = Integer.parseInt(release_date);
             statement.setInt(1, year);
@@ -222,8 +308,25 @@ public class MovieDAO {
     }
 
     //R11. L'usuari pot cercar pel·lícules per paraules clau (mostra id, títol i any de la pel·lícula)
-    public List<Movie> findByKeyword(String Keyword) {
+    public List<Movie> findByKeyword(String Keyword, String order, boolean ascendent, int page, int pageSize) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_keywords ON movie.movie_id  = movie_keywords.movie_id INNER JOIN keyword ON keyword.keyword_id = movie_keywords.keyword_id  WHERE keyword_name = ?";
+        if(!order.isEmpty()){
+            sql += " ORDER BY " + order;
+            if(ascendent){
+                sql += " ASC";
+            } else {
+                sql += " DESC";
+            }
+        }
+        if (pageSize > 0){
+            sql += " LIMIT " + pageSize;
+            int n = 1;
+            if (page > 0){
+                n = page;
+            }
+            int count = (n - 1) * pageSize;
+            sql += " OFFSET " + count;
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, Keyword);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -244,8 +347,16 @@ public class MovieDAO {
         return null;
     }
     //R12. L'usuari pot cercar pel·lícules per companyia productora (mostra id, títol i any de la pel·lícula)
-    public List<Movie> findByProduction(String production) {
+    public List<Movie> findByProduction(String production, String order, boolean ascendent, int page, int pageSize) {
         String sql = "SELECT title, movie.movie_id, release_date FROM movie INNER JOIN movie_company ON movie.movie_id  = movie_company.movie_id INNER JOIN production_company ON movie_company.company_id = production_company.company_id  WHERE company_name = ?";
+        if(!order.isEmpty()){
+            sql += " ORDER BY " + order;
+            if(ascendent){
+                sql += " ASC";
+            } else {
+                sql += " DESC";
+            }
+        }
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, production);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -365,4 +476,6 @@ public class MovieDAO {
 
         return null;
     }
+    //R17. L'usuari pot ordenar les pel·lícules que surten en una cerca per títol, any, popularitat, número de vots o puntuació
+
 }
